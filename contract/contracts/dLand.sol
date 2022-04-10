@@ -2,8 +2,9 @@
 pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract dLand is ERC721 {
+contract dLand is ERC721, Ownable {
     uint256 public cost = 0.001 ether;
     uint256 public maxSupply = 20;
     uint256 public totalSupply = 0;
@@ -28,26 +29,26 @@ contract dLand is ERC721 {
     ) ERC721(_name, _symbol) {
         cost = _cost;
 
-        allLands.push(Land("Factory1", address(0x0), 0, 0, 0, 10, 10, 10));
-        allLands.push(Land("Stadium", address(0x0), 0, 10, 0, 10, 5, 3));
-        allLands.push(Land("University", address(0x0), 0, -10, 0, 10, 5, 3));
-        allLands.push(Land("House1", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Super Market", address(0x0), 10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Shopping Plaza", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("House2", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Apartments1", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Fast Food Center", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Gas Station", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Park", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("House3", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Coffee Shop", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Residence", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Factory2", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Museum", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Gaming Zone", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Hospital", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Club", address(0x0), -10, 0, 0, 5, 25, 5));
-        allLands.push(Land("Apartments2", address(0x0), -10, 0, 0, 5, 25, 5));
+        allLands.push(Land("Factory1", address(0x0), 0, 0, 0, 9, 9, 9));
+        allLands.push(Land("Stadium", address(0x0), 0, 10, 0, 9, 9, 9));
+        allLands.push(Land("University", address(0x0), 0, -10, 0, 9, 9, 9));
+        allLands.push(Land("House1", address(0x0), -10, 0, 0, 9, 9, 9));
+        allLands.push(Land("Super Market", address(0x0), 10, 0, 0, 9, 9, 9));
+        allLands.push(Land("Shopping Plaza", address(0x0), 0, 20, 0, 9, 9, 9));
+        allLands.push(Land("House2", address(0x0), -20, 0, 0, 9, 9, 9));
+        allLands.push(Land("Apartments1", address(0x0), 0, -20, 0, 9, 9, 9));
+        allLands.push(Land("Fast Food Center", address(0x0), 20, 0, 0, 9, 9, 9));
+        allLands.push(Land("Gas Station", address(0x0), 0, 30, 0, 9, 9, 9));
+        allLands.push(Land("Park", address(0x0), -30, 0, 0, 9, 9, 9));
+        allLands.push(Land("House3", address(0x0), 0, -30, 0, 9, 9, 9));
+        allLands.push(Land("Coffee Shop", address(0x0), 30, 0, 0, 9, 9, 9));
+        allLands.push(Land("Residence", address(0x0), 0, 40, 0, 9, 9, 9));
+        allLands.push(Land("Factory2", address(0x0), -40, 0, 0, 9, 9, 9));
+        allLands.push(Land("Museum", address(0x0), 0, -40, 0, 9, 9, 9));
+        allLands.push(Land("Gaming Zone", address(0x0), 40, 0, 0, 9, 9, 9));
+        allLands.push(Land("Hospital", address(0x0), 0, 50, 0, 9, 9, 9));
+        allLands.push(Land("Club", address(0x0), -50, 0, 0, 9, 9, 9));
+        allLands.push(Land("Apartments2", address(0x0), 0, -50, 0, 9, 9, 9));
     
     }
 
@@ -97,6 +98,17 @@ contract dLand is ERC721 {
         _safeTransfer(from, to, tokenId, _data);
     }
 
+    /**
+    * withdraw sends all the ether in the contract 
+    * to the owner of the contract
+     */
+    function withdraw() public onlyOwner  {
+        address _owner = owner();
+        uint256 amount = address(this).balance;
+        (bool sent, ) =  _owner.call{value: amount}("");
+        require(sent, "Failed to send Ether");
+    }
+
     // Public View Functions
     function getallLands() public view returns (Land[] memory) {
         return allLands;
@@ -105,6 +117,12 @@ contract dLand is ERC721 {
     function getland(uint256 _id) public view returns (Land memory) {
         return allLands[_id - 1];
     }
+
+    // Function to receive Ether. msg.data must be empty
+    receive() external payable {}
+
+    // Fallback function is called when msg.data is not empty
+    fallback() external payable {}
 }
 
 //0x5FbDB2315678afecb367f032d93F642f64180aa3
